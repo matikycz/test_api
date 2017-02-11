@@ -2,16 +2,19 @@ import rest from 'rest'
 import mime from 'rest/interceptor/mime'
 
 const apiConfiguration =  {
-    configureApi(store) {
-        this.api = restApiClient(store)
+    configureApi(store, baseUrl) {
+        this.api = restApiClient(store, baseUrl)
     }
 }
 
-const restApiClient = ({ getState, dispatch }) => {
+const restApiClient = ({ getState, dispatch }, baseUrl) => {
     const client = rest.wrap(mime, { mime: 'application/json' })
+    const trimUrl = baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl
     return (params) => {
         const headers = getState().session.headers
-        const reqParams = {...params, headers}
+        const {path, ...others} = params
+        const fullUrl = trimUrl + path
+        const reqParams = {path: fullUrl, ...others, headers}
         return new Promise((resolve, reject) => {
             client(reqParams).then(
                 response => {
@@ -19,7 +22,7 @@ const restApiClient = ({ getState, dispatch }) => {
                     resolve(response.entity)
                 }
             ).catch(error => {
-                rejct(error)
+                reject(error)
             })
         })
     }

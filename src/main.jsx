@@ -30,18 +30,16 @@ const reducer = combineReducers({
 const store = configureStore(reducer)
 
 import apiConfiguration from './api/configureApi'
+const baseUrl = 'http://localhost:3000/api/v1/'
+apiConfiguration.configureApi(store, baseUrl)
 
-apiConfiguration.configureApi(store)
-
-apiConfiguration.api({
-    path: 'http://localhost:3000/api/v1/auth/sign_in',
-    method: 'POST',
-    entity: {
-         email: "admin@localhost.pl",
-         login: "admin",
-         password: "adminadmin"
-    }
-}).then(response => console.log(response))
+import api from './api/apiClient'
+api.one('exercises', 1).entity('categories').get().then(response => console.log(response))
+// api.custom('/auth/sign_in').post({
+//          email: "admin@localhost.pl",
+//          login: "admin",
+//          password: "adminadmin"
+//     }).then(response => console.log(response))
 /*
  * Configure history for Router
  */
