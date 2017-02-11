@@ -1,62 +1,68 @@
 import apiConfiguration from './configureApi'
+const apiModule = () => {
+    let path = ''
+    let method = 'GET'
+    let entity = null
 
-const api = {
-    _path: '',
-
-    collection(name) {
-        this.entity(name)
-        return this
-    },
-
-    one(name, id) {
-        this._path  = this._path + '/' + name + '/' + id
-        return this
-    },
-
-    entity(name) {
-        this._path  = this._path + '/' + name
-        return this
-    },
-
-    custom(path, method = 'GET') {
-        this._path = path
-        this._method = method
-        return this
-    },
-
-    get(query) {
-        if(query){
-            this._path += '?' + query
-        }
-        this._method = 'GET'
-        return this._makeRequest()
-    },
-
-    post(entity) {
-        this._entity = entity
-        this._method = 'POST'
-        return this._makeRequest()
-    },
-
-    put(entity) {
-        this._entity = entity
-        this._method = 'PUT'
-        return this._makeRequest()
-    },
-
-    delete() {
-        this._method = 'DELETE'
-        return this._makeRequest()
-    },
-
-    _makeRequest() {
+    const makeRequest = () => {
         const params = {
-            path: this._path,
-            method: this._method,
-            entity: this._entity
+            path: path,
+            method: method,
+            entity: entity
         }
         return apiConfiguration.api(params)
     }
+
+    return {
+         api: {
+            _path: '',
+
+            collection(name) {
+                this.entity(name)
+                return this
+            },
+
+            one(name, id) {
+                path  = path + '/' + name + '/' + id
+                return this
+            },
+
+            entity(name) {
+                path  = path + '/' + name
+                return this
+            },
+
+            custom(url) {
+                path = url
+                return this
+            },
+
+            get(query) {
+                if(query){
+                    path += '?' + query
+                }
+                method = 'GET'
+                return makeRequest()
+            },
+
+            post(body) {
+                entity = body
+                method = 'POST'
+                return makeRequest()
+            },
+
+            put(body) {
+                entity = body
+                method = 'PUT'
+                return makeRequest()
+            },
+
+            delete() {
+                method = 'DELETE'
+                return makeRequest()
+            }
+        }
+    }
 }
 
-export default api
+export default apiModule().api
